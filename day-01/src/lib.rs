@@ -1,22 +1,17 @@
-
-
-pub fn process_part1(input: &str) -> u128 {
+pub fn process_part1(input: &str) -> u32 {
     *get_calories(input).iter().max().unwrap()
 }
 
-pub fn process_part2(input: &str) -> u128 {
+pub fn process_part2(input: &str) -> u32 {
     let mut cals = get_calories(input);
-    cals.sort_by(|a, b| a.cmp(b).reverse());
-    cals[..3].iter().sum()
+    cals.sort();
+    cals.iter().rev().take(3).sum()
 }
 
-fn get_calories(input: &str) -> Vec<u128> {
+fn get_calories(input: &str) -> Vec<u32> {
     input.split("\n\n")
-        .map(|elve|
-            elve.split("\n")
-                .map(|item| item.parse::<u128>().unwrap())
-                .sum()
-        ).collect()
+        .map(|elv| elv.lines().map(|cal| cal.parse::<u32>().unwrap()).sum::<u32>())
+        .collect()
 }
 
 #[cfg(test)]

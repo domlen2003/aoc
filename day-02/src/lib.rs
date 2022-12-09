@@ -1,108 +1,46 @@
 pub fn process_part1(input: &str) -> u32 {
-    input.split("\n").map(|game| {
-        let signs: Vec<&str> = game.split(" ").collect();
-        let opponent = get_sign(signs[0]);
-        let own = get_sign(signs[1]);
-        calc_points(&own, &calc_result(&own, &opponent))
+    input.lines().map(|game| {
+        calc_part1(get_game_nums(game))
     }).collect::<Vec<u32>>().iter().sum()
 }
-
 
 pub fn process_part2(input: &str) -> u32 {
-    input.split("\n").map(|game| {
-        let signs: Vec<&str> = game.split(" ").collect();
-        let opponent = get_sign(signs[0]);
-        let target = get_target(signs[1]);
-        calc_points(&calc_sign(&opponent, &target), &target)
+    input.lines().map(|game| {
+        calc_part2(get_game_nums(game))
     }).collect::<Vec<u32>>().iter().sum()
 }
 
+/*
+ Rock = 0 ,
+ Paper = 1,
+ Scissors = 2
 
-enum Result {
-    WIN,
-    LOSE,
-    DRAW,
+Wins:
+ a - b
+ 0 - 2
+ 2 - 1
+ 1 - 0
+
+ win if b - a % 3 == 2 (signed module)
+ unsigned version -> b +3 - a % 3 == 2
+*/
+fn calc_part1(game: (u32, u32)) -> u32 {
+    (game.1 + 1) + if (game.0 + 3 - game.1) % 3 == 2 { 6 } else if game.0 == game.1 { 3 } else { 0 }
 }
 
-enum Sign {
-    ROCK,
-    PAPER,
-    SCISSORS,
-}
-
-fn calc_points(sign: &Sign, outcome: &Result) -> u32 {
-    let outcome_val = match outcome {
-        Result::WIN => 6,
-        Result::LOSE => 0,
-        Result::DRAW => 3,
-    };
-    let sign_val = match sign {
-        Sign::ROCK => 1,
-        Sign::PAPER => 2,
-        Sign::SCISSORS => 3,
-    };
-    outcome_val + sign_val
-}
-
-fn calc_sign(opponent: &Sign, target: &Result) -> Sign {
-    match target {
-        Result::WIN => match opponent {
-            Sign::ROCK => Sign::PAPER,
-            Sign::PAPER => Sign::SCISSORS,
-            Sign::SCISSORS => Sign::ROCK,
-        },
-        Result::LOSE => match opponent {
-            Sign::ROCK => Sign::SCISSORS,
-            Sign::PAPER => Sign::ROCK,
-            Sign::SCISSORS => Sign::PAPER,
-        },
-        Result::DRAW => match opponent {
-            Sign::ROCK => Sign::ROCK,
-            Sign::PAPER => Sign::PAPER,
-            Sign::SCISSORS => Sign::SCISSORS,
-        },
+fn calc_part2(game: (u32, u32)) -> u32 {
+    //game.1 is the result
+    match game.1 {
+        0 => ((game.0 + 2) % 3) + 1 + 0,//(opponent+2)%3  is a the lose sign    +1 for the sign value +0 for the lose
+        1 => game.0 + 1 + 3,//draw sign is the same sign as the opponent         +1 for the sign value  +3 for the draw
+        2 => ((game.0 + 1) % 3) + 1 + 6,//(opponent+2)%3  is a the win sign      +1 for the sign value +6 for the win
+        _ => unreachable!(),
     }
 }
 
-fn calc_result(own: &Sign, opponent: &Sign) -> Result {
-    match own {
-        Sign::ROCK => match opponent {
-            Sign::ROCK => Result::DRAW,
-            Sign::PAPER => Result::LOSE,
-            Sign::SCISSORS => Result::WIN
-        },
-        Sign::PAPER => match opponent {
-            Sign::ROCK => Result::WIN,
-            Sign::PAPER => Result::DRAW,
-            Sign::SCISSORS => Result::LOSE
-        },
-        Sign::SCISSORS => match opponent {
-            Sign::ROCK => Result::LOSE,
-            Sign::PAPER => Result::WIN,
-            Sign::SCISSORS => Result::DRAW,
-        },
-    }
-}
-
-fn get_sign(character: &str) -> Sign {
-    match character {
-        "A" => Sign::ROCK,
-        "B" => Sign::PAPER,
-        "C" => Sign::SCISSORS,
-        "X" => Sign::ROCK,
-        "Y" => Sign::PAPER,
-        "Z" => Sign::SCISSORS,
-        &_ => panic!("Unknown sign")
-    }
-}
-
-fn get_target(character: &str) -> Result {
-    match character {
-        "X" => Result::LOSE,
-        "Y" => Result::DRAW,
-        "Z" => Result::WIN,
-        &_ => panic!("Unknown target")
-    }
+fn get_game_nums(game: &str) -> (u32, u32) {
+    let (opponent, own) = game.split_once(" ").unwrap();
+    (opponent.as_bytes()[0] as u32 - 65, own.as_bytes()[0] as u32 - 88)
 }
 
 #[cfg(test)]
