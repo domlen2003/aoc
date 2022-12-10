@@ -45,13 +45,12 @@ fn get_game_nums(game: &str) -> (u32, u32) {
 
 #[cfg(test)]
 mod tests {
-    // Note this useful idiom: importing names from outer (for mod tests) scope.
     use super::*;
-
+    const INPUT: &str = "A Y\nB X\nC Z";
     #[test]
     fn test_part1() {
         assert_eq!(
-            process_part1("A Y\nB X\nC Z"),
+            process_part1(INPUT),
             15
         );
     }
@@ -59,7 +58,7 @@ mod tests {
     #[test]
     fn test_part2() {
         assert_eq!(
-            process_part2("A Y\nB X\nC Z"),
+            process_part2(INPUT),
             12
         );
     }
